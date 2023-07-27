@@ -1,7 +1,7 @@
 package com.example.demo.dto;
 
 public class InputQuestionDto {
-	private String username;
+	private String email;
 	
 	private String question;
 	
@@ -13,20 +13,20 @@ public class InputQuestionDto {
 		
 	}
 
-	public InputQuestionDto(String username, String question, String subject, String topic) {
+	public InputQuestionDto(String email, String question, String subject, String topic) {
 		super();
-		this.username = username;
+		this.email = email;
 		this.question = question;
 		this.subject = subject;
 		this.topic = topic;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getQuestion() {

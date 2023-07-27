@@ -30,11 +30,14 @@ public class User {
 	@Column(name = "password", nullable = false)
 	private String password;
 	
+	@Column(name = "expert", nullable = true)
+	private String expert;
+	
 	public User() {
 		
 	}
 
-	public User(Long id, String username, String firstName, String lastName, String email, String password) {
+	public User(Long id, String username, String firstName, String lastName, String email, String password, String expert) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -42,6 +45,7 @@ public class User {
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
+		this.expert = expert;
 	}
 
 	public Long getId() {
@@ -92,10 +96,12 @@ public class User {
 		this.password = password;
 	}
 
-//	@Override
-//	public String toString() {
-//		return "User [id=" + id + ", username=" + username + ", firstName=" + firstName + ", lastName=" + lastName
-//				+ ", email=" + email + ", password=" + password + "]";
-//	}
+	public String getExpert() {
+		return expert;
+	}
+	
+	public void setExpert(String expert) {
+		this.expert = expert;
+	}
 	
 }

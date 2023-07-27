@@ -4,13 +4,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.io.BufferedReader;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.ContributedQuestionsDto;
+import com.example.demo.dto.ExamSubmitRequestDto;
+import com.example.demo.dto.ExpertQuestionDto;
+import com.example.demo.dto.GenerateRequestDto;
+import com.example.demo.dto.GenerateResponseDto;
 import com.example.demo.dto.InputQuestionDto;
 import com.example.demo.dto.LoginDto;
 import com.example.demo.dto.QuestionResponse;
@@ -20,8 +28,10 @@ import com.example.demo.exception.EmailAlreadyExistException;
 import com.example.demo.exception.QuestionNotValidError;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.exception.UsernameAlreadyExistException;
+import com.example.demo.model.Expert;
 import com.example.demo.model.Question;
 import com.example.demo.model.User;
+import com.example.demo.repository.ExpertRepository;
 import com.example.demo.repository.QuestionRepossitory;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
@@ -38,6 +48,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private QuestionRepossitory questionRepossitory;
+	
+	@Autowired
+	private ExpertRepository expertRepository;
 
 	@Override
 	public RegistrationResponse saveUser(UserDto new_user) {
@@ -71,16 +84,16 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public User getUserByUsername(String username) {
-		return userRepository.findByUsername(username);
+	public User getUserByEmail(String email) {
+		return userRepository.findByEmail(email);
 	}
 
 	@Override
 	public RegistrationResponse checkUser(LoginDto user) {
-		User existingUser = userRepository.findByUsername(user.getUsername());
+		User existingUser = userRepository.findByEmail(user.getEmail());
 		
 		if(existingUser == null) {
-			throw new ResourceNotFoundException("Username");
+			throw new ResourceNotFoundException("Email");
 		}
 		else {
 			
@@ -133,7 +146,7 @@ public class UserServiceImpl implements UserService{
 	        
 	        if(!sim_qsn && !sim_topic && !invalid_topic) {
 	        	Question question = new Question();
-	        	question.setUsername(new_qsn.getUsername());
+	        	question.setEmail(new_qsn.getEmail());
 	        	question.setQuestion(new_qsn.getQuestion());
 	        	question.setSubject(new_qsn.getSubject());
 	        	question.setTopic(new_qsn.getTopic());
@@ -158,6 +171,157 @@ public class UserServiceImpl implements UserService{
 		
 		return new QuestionResponse("A strange error occured", false);
 		
+	}
+
+	@Override
+	public List<Question> generateQuestions(GenerateRequestDto qsn_patern) {
+		List<Question> qsn_list = questionRepossitory.findBySubjectAndTopicIn(qsn_patern.getSubject(), qsn_patern.getTopic()); 
+		
+		List<Question> mark_one_list = new ArrayList<>();
+		List<Question> mark_two_list = new ArrayList<>();
+		List<Question> mark_three_list = new ArrayList<>();
+		List<Question> mark_four_list = new ArrayList<>();
+		List<Question> mark_five_list = new ArrayList<>();
+		List<Question> final_paper = new ArrayList<>();
+		
+		for(Question each_qsn : qsn_list) {
+			if(each_qsn.getMarks()==1) {
+				mark_one_list.add(each_qsn);
+			}
+			else if(each_qsn.getMarks()==2) {
+				mark_two_list.add(each_qsn);
+			}
+			else if(each_qsn.getMarks()==3) {
+				mark_three_list.add(each_qsn);
+			}
+			else if(each_qsn.getMarks()==4) {
+				mark_four_list.add(each_qsn);
+			}
+			else if(each_qsn.getMarks()==5) {
+				mark_five_list.add(each_qsn);
+			}
+		}
+		
+		// Shuffle the lists
+	    Collections.shuffle(mark_two_list);
+	    Collections.shuffle(mark_three_list);
+	    Collections.shuffle(mark_five_list);
+	    Collections.shuffle(mark_one_list);
+	    Collections.shuffle(mark_two_list);
+		
+		//for marks 50
+		if(qsn_patern.getFull_marks()==50) {
+			for(int i = 0; i<5; i++) {
+				final_paper.add(mark_two_list.get(i));
+			}
+			for(int i = 0; i<5; i++) {
+				final_paper.add(mark_three_list.get(i));
+			}
+			for(int i = 0; i<5; i++) {
+				final_paper.add(mark_five_list.get(i));
+			}
+		}
+		else if(qsn_patern.getFull_marks()==30) {
+			for(int i = 0; i<5; i++) {
+				final_paper.add(mark_one_list.get(i));
+			}
+			for(int i = 0; i<10; i++) {
+				final_paper.add(mark_two_list.get(i));
+			}
+			for(int i = 0; i<3; i++) {
+				final_paper.add(mark_five_list.get(i));
+			}
+		}
+		else if(qsn_patern.getFull_marks()==70) {
+			for(int i = 0; i<10; i++) {
+				final_paper.add(mark_two_list.get(i));
+			}
+			for(int i = 0; i<5; i++) {
+				final_paper.add(mark_four_list.get(i));
+			}
+			for(int i = 0; i<6; i++) {
+				final_paper.add(mark_five_list.get(i));
+			}
+		}
+		else if(qsn_patern.getFull_marks()==100) {
+			for(int i = 0; i<10; i++) {
+				final_paper.add(mark_one_list.get(i)); //10
+			}
+			for(int i = 0; i<10; i++) {
+				final_paper.add(mark_two_list.get(i)); //20
+			}
+			
+			for(int i = 0; i<10; i++) {
+				final_paper.add(mark_three_list.get(i)); //30
+			}
+			
+			for(int i = 0; i<10; i++) {
+				final_paper.add(mark_five_list.get(i)); //50
+			}
+		}
+		
+		return final_paper;
+	}
+
+	@Override
+	public Expert addExpertQuestion(Expert new_qsn) {
+		return expertRepository.save(new_qsn);
+	}
+
+	@Override
+	public List<ExpertQuestionDto> generatExpertQuestion(String subject) {
+		System.out.println(subject);
+		List<Expert> qsn_list = expertRepository.findBySubject(subject);
+		
+		Collections.shuffle(qsn_list);
+		
+		List<ExpertQuestionDto> final_paper = new ArrayList<>();
+		
+		for(int i=0; i<10; i++) {
+			ExpertQuestionDto new_qsn = new ExpertQuestionDto();
+			new_qsn.setQuestion(qsn_list.get(i).getQuestion());
+			new_qsn.setOption_a(qsn_list.get(i).getOption_a());
+			new_qsn.setOption_b(qsn_list.get(i).getOption_b());
+			new_qsn.setOption_c(qsn_list.get(i).getOption_c());
+			new_qsn.setOption_d(qsn_list.get(i).getOption_d());
+			new_qsn.setAnswer(qsn_list.get(i).getAnswer());
+			new_qsn.setSubject(qsn_list.get(i).getSubject());
+			
+			final_paper.add(new_qsn);
+		}
+		
+		return final_paper;
+	}
+
+
+	@Override
+	public QuestionResponse expertExamResult(ExamSubmitRequestDto new_paper) {
+		if(new_paper.getMarks()>7) {
+			User extUser = userRepository.findByEmail(new_paper.getEmail());
+			extUser.setExpert(new_paper.getSubject());
+			userRepository.save(extUser);
+			
+			return new QuestionResponse("Exam passed successfully", true);
+		}
+		
+		return new QuestionResponse("Exam not cleared.. you can try again anytime.", false);
+	}
+
+	@Override
+	public List<ContributedQuestionsDto> getContributedQuestions(String email) {
+		List<Question> qsn_list = questionRepossitory.findByEmail(email);
+		List<ContributedQuestionsDto> finaList = new ArrayList<>();
+		
+		for(Question each_qsn: qsn_list) {
+			ContributedQuestionsDto new_qsn = new ContributedQuestionsDto();
+			new_qsn.setMarks(each_qsn.getMarks());
+			new_qsn.setQuestion(each_qsn.getQuestion());
+			new_qsn.setTopic(each_qsn.getTopic());
+			
+			finaList.add(new_qsn);
+		}
+		
+		return finaList;
 	}
 
 }

@@ -15,8 +15,8 @@ public class Question {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name = "username", nullable = false)
-	private String username;
+	@Column(name = "email", nullable = false)
+	private String email;
 	
 	@Column(name = "question", nullable = false)
 	private String question;
@@ -37,10 +37,10 @@ public class Question {
 		
 	}
 
-	public Question(Long id, String username, String question, String subject, String topic, int marks, int weightage) {
+	public Question(Long id, String email, String question, String subject, String topic, int marks, int weightage) {
 		super();
 		this.id = id;
-		this.username = username;
+		this.email = email;
 		this.question = question;
 		this.subject = subject;
 		this.topic = topic;
@@ -56,12 +56,12 @@ public class Question {
 		this.id = id;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getQuestion() {
