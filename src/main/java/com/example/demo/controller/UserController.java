@@ -40,7 +40,7 @@ public class UserController {
 		return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
 	}
 	
-	@GetMapping("qms/login")
+	@PostMapping("qms/login")
 	public ResponseEntity<?> userLogin(@RequestBody LoginDto user){
 		return new ResponseEntity<>(userService.checkUser(user), HttpStatus.OK);
 	}
@@ -50,7 +50,7 @@ public class UserController {
 		return new ResponseEntity<>(userService.getQuestion(new_qsn), HttpStatus.CREATED);
 	}
 	
-	@GetMapping("/qms/generate")
+	@PostMapping("/qms/generate")
 	public ResponseEntity<?> getGeneratedQuestion(@RequestBody GenerateRequestDto generateRequest){
 		return new ResponseEntity<>(userService.generateQuestions(generateRequest), HttpStatus.OK);
 	}

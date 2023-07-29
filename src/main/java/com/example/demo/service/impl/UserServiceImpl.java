@@ -23,15 +23,18 @@ import com.example.demo.dto.InputQuestionDto;
 import com.example.demo.dto.LoginDto;
 import com.example.demo.dto.QuestionResponse;
 import com.example.demo.dto.RegistrationResponse;
+import com.example.demo.dto.UserDetailsDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.exception.EmailAlreadyExistException;
 import com.example.demo.exception.QuestionNotValidError;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.exception.UsernameAlreadyExistException;
 import com.example.demo.model.Expert;
+import com.example.demo.model.GeneratedPaper;
 import com.example.demo.model.Question;
 import com.example.demo.model.User;
 import com.example.demo.repository.ExpertRepository;
+import com.example.demo.repository.GeneratedPaperRepository;
 import com.example.demo.repository.QuestionRepossitory;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
@@ -51,6 +54,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private ExpertRepository expertRepository;
+	
+	@Autowired
+	private GeneratedPaperRepository generatedPaperRepository;
 
 	@Override
 	public RegistrationResponse saveUser(UserDto new_user) {
@@ -84,8 +90,37 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public User getUserByEmail(String email) {
-		return userRepository.findByEmail(email);
+	public UserDetailsDto getUserByEmail(String email) {
+		User extUser = userRepository.findByEmail(email);
+		
+		UserDetailsDto new_user = new UserDetailsDto();
+		
+		new_user.setUsername(extUser.getUsername());
+		new_user.setFirstName(extUser.getFirstName());
+		new_user.setLastName(extUser.getLastName());
+		new_user.setEmail(extUser.getEmail());
+		new_user.setExpert(extUser.getExpert());
+		
+		List<Question> qsn_details = questionRepossitory.findByEmail(email);
+		List<GeneratedPaper> paper_details = generatedPaperRepository.findByEmail(email);
+		List<String> qsnList = new ArrayList<>();
+		List<String> topicList = new ArrayList<>();
+		List<Integer> marksList = new ArrayList<>();
+		
+		for(Question each_qsn: qsn_details) {
+			qsnList.add(each_qsn.getQuestion());
+		}
+		
+		for(GeneratedPaper paper : paper_details) {
+			topicList.add(paper.getTopic());
+			marksList.add(paper.getMarks());
+		}
+		
+		new_user.setContributedQuestions(qsnList);
+		new_user.setGeneratedPapers(topicList);
+		new_user.setMarks(marksList);
+		
+		return new_user;
 	}
 
 	@Override
@@ -259,6 +294,23 @@ public class UserServiceImpl implements UserService{
 				final_paper.add(mark_five_list.get(i)); //50
 			}
 		}
+		
+		//adding data in the qsn_paper_db table
+		String topic = "";
+		for(String str: qsn_patern.getTopic()) {
+			topic += str+", ";
+		}
+		
+		topic = topic.substring(0, topic.length()-2);
+		
+		GeneratedPaper generatedPaper = new GeneratedPaper();
+		generatedPaper.setEmail(qsn_patern.getEmail());
+		generatedPaper.setMarks(qsn_patern.getFull_marks());
+		generatedPaper.setSubject(qsn_patern.getSubject());
+		generatedPaper.setTopic(topic);
+		
+		generatedPaperRepository.save(generatedPaper);
+		
 		
 		return final_paper;
 	}

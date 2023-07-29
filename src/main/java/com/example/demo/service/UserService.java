@@ -11,6 +11,7 @@ import com.example.demo.dto.InputQuestionDto;
 import com.example.demo.dto.LoginDto;
 import com.example.demo.dto.QuestionResponse;
 import com.example.demo.dto.RegistrationResponse;
+import com.example.demo.dto.UserDetailsDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.model.Expert;
 import com.example.demo.model.Question;
@@ -19,7 +20,7 @@ import com.example.demo.model.User;
 public interface UserService {
 	//user services
 	RegistrationResponse saveUser(UserDto new_user);
-	User getUserByEmail(String email);
+	UserDetailsDto getUserByEmail(String email);
 	RegistrationResponse checkUser(LoginDto user);
 	List<ContributedQuestionsDto> getContributedQuestions(String email);
 	

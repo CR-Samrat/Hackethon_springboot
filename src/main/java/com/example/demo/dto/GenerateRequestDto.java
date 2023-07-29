@@ -3,6 +3,7 @@ package com.example.demo.dto;
 import java.util.List;
 
 public class GenerateRequestDto {
+	private String email;
 	private String subject;
 	private List<String> topic;
 	private int full_marks;
@@ -11,13 +12,23 @@ public class GenerateRequestDto {
 		
 	}
 
-	public GenerateRequestDto(String subject, List<String> topic, int full_marks) {
+	public GenerateRequestDto(String email, String subject, List<String> topic, int full_marks) {
 		super();
+		
+		this.email = email;
 		this.subject = subject;
 		this.topic = topic;
 		this.full_marks = full_marks;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+	
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
 	public String getSubject() {
 		return subject;
 	}
