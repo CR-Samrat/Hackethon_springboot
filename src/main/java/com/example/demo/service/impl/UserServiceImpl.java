@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService{
 		List<String> topicList = new ArrayList<>();
 		List<Integer> marksList = new ArrayList<>();
 		List<String> paperTitles = new ArrayList<>();
+		List<String> uuidList = new ArrayList<>();
 		
 		for(Question each_qsn: qsn_details) {
 			qsnList.add(each_qsn.getQuestion());
@@ -121,12 +122,14 @@ public class UserServiceImpl implements UserService{
 			topicList.add(paper.getTopic());
 			marksList.add(paper.getMarks());
 			paperTitles.add(paper.getTitle());
+			uuidList.add(paper.getUuid());
 		}
 		
 		new_user.setContributedQuestions(qsnList);
 		new_user.setGeneratedPapers(topicList);
 		new_user.setPaperTitles(paperTitles);
 		new_user.setMarks(marksList);
+		new_user.setUuid(uuidList);
 		
 		return new_user;
 	}
@@ -218,7 +221,7 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public List<Question> generateQuestions(GenerateRequestDto qsn_patern) {
-		List<GeneratedPaper> extPapers = generatedPaperRepository.findQuestions(qsn_patern.getEmail(), qsn_patern.getTitle());
+		List<GeneratedPaper> extPapers = generatedPaperRepository.findQuestions(qsn_patern.getEmail(), qsn_patern.getUuid());
 		
 		if(extPapers.size()==0) {
 			List<Question> qsn_list = questionRepossitory.findBySubjectAndTopicIn(qsn_patern.getSubject(), qsn_patern.getTopic()); 
@@ -320,6 +323,7 @@ public class UserServiceImpl implements UserService{
 			generatedPaper.setSubject(qsn_patern.getSubject());
 			generatedPaper.setTitle(qsn_patern.getTitle());
 			generatedPaper.setTopic(topic);
+			generatedPaper.setUuid(qsn_patern.getUuid());
 			generatedPaper.setQuestions(final_paper);
 			
 			generatedPaperRepository.save(generatedPaper);
@@ -396,7 +400,7 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public List<QuestionDto> getGeneratedPapers(GeneratedPaperRequest paper) {
-		List<GeneratedPaper> ext_paper = generatedPaperRepository.findQuestions(paper.getEmail(), paper.getTitle());
+		List<GeneratedPaper> ext_paper = generatedPaperRepository.findQuestions(paper.getEmail(), paper.getUuid());
 //		List<GeneratedPaper> ext_paper = generatedPaperRepository.findByTitle(paper.getTitle());
 		List<Question> extQuestions = ext_paper.get(0).getQuestions();
 		List<QuestionDto> final_paper = new ArrayList<>();

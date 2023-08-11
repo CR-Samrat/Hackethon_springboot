@@ -21,6 +21,7 @@ public class GeneratedPaper {
 	private String subject;
 	private String topic;
 	private int marks;
+	private String uuid;
 	
 	@ManyToMany
 	private List<Question> questions;
@@ -29,7 +30,7 @@ public class GeneratedPaper {
 		
 	}
 	
-	public GeneratedPaper(Long id, String title, String email, String subject, String topic, int marks, List<Question>questions ) {
+	public GeneratedPaper(Long id, String title, String email, String subject, String topic, int marks, String uuid ,List<Question>questions ) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -38,6 +39,7 @@ public class GeneratedPaper {
 		this.topic = topic;
 		this.marks = marks;
 		this.questions = questions;
+		this.uuid = uuid;
 	}
 
 	public Long getId() {
@@ -96,4 +98,11 @@ public class GeneratedPaper {
 		this.questions = questions;
 	}
 	
+	public String getUuid() {
+		return uuid;
+	}
+	
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
 }

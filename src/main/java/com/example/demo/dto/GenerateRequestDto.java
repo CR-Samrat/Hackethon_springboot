@@ -8,12 +8,13 @@ public class GenerateRequestDto {
 	private String subject;
 	private List<String> topic;
 	private int full_marks;
+	private String uuid;
 	
 	public GenerateRequestDto() {
 		
 	}
 
-	public GenerateRequestDto(String email, String title ,String subject, List<String> topic, int full_marks) {
+	public GenerateRequestDto(String email, String title ,String subject, List<String> topic, int full_marks, String uuid) {
 		super();
 		
 		this.title = title;
@@ -21,6 +22,7 @@ public class GenerateRequestDto {
 		this.subject = subject;
 		this.topic = topic;
 		this.full_marks = full_marks;
+		this.uuid = uuid;
 	}
 
 	public String getEmail() {
@@ -63,5 +65,11 @@ public class GenerateRequestDto {
 		this.title = title;
 	}
 	
+	public String getUuid() {
+		return uuid;
+	}
 	
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
 }

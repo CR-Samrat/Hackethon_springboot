@@ -12,13 +12,14 @@ public class UserDetailsDto {
 	private List<String> generatedPapers;
 	private List<String> paperTitles;
 	private List<Integer> marks;
+	private List<String> uuid;
 	
 	public UserDetailsDto() {
 		
 	}
 	
 	public UserDetailsDto(String username, String firstName, String lastName, String email, String expert,
-			List<String> contributedQuestions, List<String> generatedPapers, List<String> paperTitles , List<Integer> marks) {
+			List<String> contributedQuestions, List<String> generatedPapers, List<String> paperTitles , List<Integer> marks, List<String> uuid) {
 		super();
 		this.username = username;
 		this.firstName = firstName;
@@ -29,6 +30,7 @@ public class UserDetailsDto {
 		this.generatedPapers = generatedPapers;
 		this.paperTitles = paperTitles;
 		this.marks = marks;
+		this.uuid = uuid;
 	}
 
 	public String getUsername() {
@@ -103,4 +105,11 @@ public class UserDetailsDto {
 		this.paperTitles = paperTitles;
 	}
 	
+	public List<String> getUuid() {
+		return uuid;
+	}
+	
+	public void setUuid(List<String> uuid) {
+		this.uuid = uuid;
+	}
 }

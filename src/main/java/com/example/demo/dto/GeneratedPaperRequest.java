@@ -2,16 +2,16 @@ package com.example.demo.dto;
 
 public class GeneratedPaperRequest {
 	private String email;
-	private String title;
+	private String uuid;
 	
 	public GeneratedPaperRequest() {
 		
 	}
 	
-	public GeneratedPaperRequest(String email, String title) {
+	public GeneratedPaperRequest(String email, String uuid) {
 		super();
 		this.email = email;
-		this.title = title;
+		this.uuid = uuid;
 	}
 	
 	public String getEmail() {
@@ -20,11 +20,11 @@ public class GeneratedPaperRequest {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getTitle() {
-		return title;
+	public String getUuid() {
+		return uuid;
 	}
-	public void setTitle(String title) {
-		this.title = title;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 	
 	

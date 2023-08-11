@@ -10,8 +10,8 @@ import com.example.demo.model.GeneratedPaper;
 public interface GeneratedPaperRepository extends JpaRepository<GeneratedPaper, Long>{
 	List<GeneratedPaper> findByEmail(String email);
 	
-	@Query(value = "SELECT * FROM qsn_papers_db q WHERE q.email=:email AND q.title=:title", nativeQuery = true)
-	List<GeneratedPaper> findQuestions(String email, String title);
+	@Query(value = "SELECT * FROM qsn_papers_db q WHERE q.email=:email AND q.uuid=:uuid", nativeQuery = true)
+	List<GeneratedPaper> findQuestions(String email, String uuid);
 
 	List<GeneratedPaper> findByTitle(String title);
 
