@@ -10,6 +10,7 @@ public class UserDetailsDto {
 	private String expert;
 	private List<String> contributedQuestions;
 	private List<String> generatedPapers;
+	private List<String> paperTitles;
 	private List<Integer> marks;
 	
 	public UserDetailsDto() {
@@ -17,7 +18,7 @@ public class UserDetailsDto {
 	}
 	
 	public UserDetailsDto(String username, String firstName, String lastName, String email, String expert,
-			List<String> contributedQuestions, List<String> generatedPapers, List<Integer> marks) {
+			List<String> contributedQuestions, List<String> generatedPapers, List<String> paperTitles , List<Integer> marks) {
 		super();
 		this.username = username;
 		this.firstName = firstName;
@@ -26,6 +27,7 @@ public class UserDetailsDto {
 		this.expert = expert;
 		this.contributedQuestions = contributedQuestions;
 		this.generatedPapers = generatedPapers;
+		this.paperTitles = paperTitles;
 		this.marks = marks;
 	}
 
@@ -91,6 +93,14 @@ public class UserDetailsDto {
 
 	public void setMarks(List<Integer> marks) {
 		this.marks = marks;
+	}
+
+	public List<String> getPaperTitles() {
+		return paperTitles;
+	}
+
+	public void setPaperTitles(List<String> paperTitles) {
+		this.paperTitles = paperTitles;
 	}
 	
 }

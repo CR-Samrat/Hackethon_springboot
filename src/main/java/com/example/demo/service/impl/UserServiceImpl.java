@@ -13,14 +13,17 @@ import java.io.BufferedReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.ContributedQuestionsDto;
 import com.example.demo.dto.ExamSubmitRequestDto;
 import com.example.demo.dto.ExpertQuestionDto;
 import com.example.demo.dto.GenerateRequestDto;
 import com.example.demo.dto.GenerateResponseDto;
+import com.example.demo.dto.GeneratedPaperRequest;
 import com.example.demo.dto.InputQuestionDto;
 import com.example.demo.dto.LoginDto;
+import com.example.demo.dto.QuestionDto;
 import com.example.demo.dto.QuestionResponse;
 import com.example.demo.dto.RegistrationResponse;
 import com.example.demo.dto.UserDetailsDto;
@@ -40,7 +43,9 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 @Service
+@Transactional
 public class UserServiceImpl implements UserService{
 
 	@Autowired
@@ -70,7 +75,7 @@ public class UserServiceImpl implements UserService{
 		}
 		
 		if(ext_user_2 != null) {
-			throw new UsernameAlreadyExistException(new_user.getUsername());
+			throw new UsernameAlreadyExistException(new_user.getUsername(), "Username");
 		}
 		
 		//saving the new user
@@ -106,6 +111,7 @@ public class UserServiceImpl implements UserService{
 		List<String> qsnList = new ArrayList<>();
 		List<String> topicList = new ArrayList<>();
 		List<Integer> marksList = new ArrayList<>();
+		List<String> paperTitles = new ArrayList<>();
 		
 		for(Question each_qsn: qsn_details) {
 			qsnList.add(each_qsn.getQuestion());
@@ -114,10 +120,12 @@ public class UserServiceImpl implements UserService{
 		for(GeneratedPaper paper : paper_details) {
 			topicList.add(paper.getTopic());
 			marksList.add(paper.getMarks());
+			paperTitles.add(paper.getTitle());
 		}
 		
 		new_user.setContributedQuestions(qsnList);
 		new_user.setGeneratedPapers(topicList);
+		new_user.setPaperTitles(paperTitles);
 		new_user.setMarks(marksList);
 		
 		return new_user;
@@ -210,109 +218,119 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public List<Question> generateQuestions(GenerateRequestDto qsn_patern) {
-		List<Question> qsn_list = questionRepossitory.findBySubjectAndTopicIn(qsn_patern.getSubject(), qsn_patern.getTopic()); 
+		List<GeneratedPaper> extPapers = generatedPaperRepository.findQuestions(qsn_patern.getEmail(), qsn_patern.getTitle());
 		
-		List<Question> mark_one_list = new ArrayList<>();
-		List<Question> mark_two_list = new ArrayList<>();
-		List<Question> mark_three_list = new ArrayList<>();
-		List<Question> mark_four_list = new ArrayList<>();
-		List<Question> mark_five_list = new ArrayList<>();
-		List<Question> final_paper = new ArrayList<>();
-		
-		for(Question each_qsn : qsn_list) {
-			if(each_qsn.getMarks()==1) {
-				mark_one_list.add(each_qsn);
-			}
-			else if(each_qsn.getMarks()==2) {
-				mark_two_list.add(each_qsn);
-			}
-			else if(each_qsn.getMarks()==3) {
-				mark_three_list.add(each_qsn);
-			}
-			else if(each_qsn.getMarks()==4) {
-				mark_four_list.add(each_qsn);
-			}
-			else if(each_qsn.getMarks()==5) {
-				mark_five_list.add(each_qsn);
-			}
-		}
-		
-		// Shuffle the lists
-	    Collections.shuffle(mark_two_list);
-	    Collections.shuffle(mark_three_list);
-	    Collections.shuffle(mark_five_list);
-	    Collections.shuffle(mark_one_list);
-	    Collections.shuffle(mark_two_list);
-		
-		//for marks 50
-		if(qsn_patern.getFull_marks()==50) {
-			for(int i = 0; i<5; i++) {
-				final_paper.add(mark_two_list.get(i));
-			}
-			for(int i = 0; i<5; i++) {
-				final_paper.add(mark_three_list.get(i));
-			}
-			for(int i = 0; i<5; i++) {
-				final_paper.add(mark_five_list.get(i));
-			}
-		}
-		else if(qsn_patern.getFull_marks()==30) {
-			for(int i = 0; i<5; i++) {
-				final_paper.add(mark_one_list.get(i));
-			}
-			for(int i = 0; i<10; i++) {
-				final_paper.add(mark_two_list.get(i));
-			}
-			for(int i = 0; i<3; i++) {
-				final_paper.add(mark_five_list.get(i));
-			}
-		}
-		else if(qsn_patern.getFull_marks()==70) {
-			for(int i = 0; i<10; i++) {
-				final_paper.add(mark_two_list.get(i));
-			}
-			for(int i = 0; i<5; i++) {
-				final_paper.add(mark_four_list.get(i));
-			}
-			for(int i = 0; i<6; i++) {
-				final_paper.add(mark_five_list.get(i));
-			}
-		}
-		else if(qsn_patern.getFull_marks()==100) {
-			for(int i = 0; i<10; i++) {
-				final_paper.add(mark_one_list.get(i)); //10
-			}
-			for(int i = 0; i<10; i++) {
-				final_paper.add(mark_two_list.get(i)); //20
+		if(extPapers.size()==0) {
+			List<Question> qsn_list = questionRepossitory.findBySubjectAndTopicIn(qsn_patern.getSubject(), qsn_patern.getTopic()); 
+			
+			List<Question> mark_one_list = new ArrayList<>();
+			List<Question> mark_two_list = new ArrayList<>();
+			List<Question> mark_three_list = new ArrayList<>();
+			List<Question> mark_four_list = new ArrayList<>();
+			List<Question> mark_five_list = new ArrayList<>();
+			List<Question> final_paper = new ArrayList<>();
+			
+			for(Question each_qsn : qsn_list) {
+				if(each_qsn.getMarks()==1) {
+					mark_one_list.add(each_qsn);
+				}
+				else if(each_qsn.getMarks()==2) {
+					mark_two_list.add(each_qsn);
+				}
+				else if(each_qsn.getMarks()==3) {
+					mark_three_list.add(each_qsn);
+				}
+				else if(each_qsn.getMarks()==4) {
+					mark_four_list.add(each_qsn);
+				}
+				else if(each_qsn.getMarks()==5) {
+					mark_five_list.add(each_qsn);
+				}
 			}
 			
-			for(int i = 0; i<10; i++) {
-				final_paper.add(mark_three_list.get(i)); //30
+			// Shuffle the lists
+		    Collections.shuffle(mark_two_list);
+		    Collections.shuffle(mark_three_list);
+		    Collections.shuffle(mark_five_list);
+		    Collections.shuffle(mark_one_list);
+		    Collections.shuffle(mark_four_list);
+			
+			//for marks 50
+			if(qsn_patern.getFull_marks()==50) {
+				for(int i = 0; i<5; i++) {
+					final_paper.add(mark_two_list.get(i));
+				}
+				for(int i = 0; i<5; i++) {
+					final_paper.add(mark_three_list.get(i));
+				}
+				for(int i = 0; i<5; i++) {
+					final_paper.add(mark_five_list.get(i));
+				}
+			}
+			else if(qsn_patern.getFull_marks()==30) {
+				for(int i = 0; i<5; i++) {
+					final_paper.add(mark_one_list.get(i));
+				}
+				for(int i = 0; i<10; i++) {
+					final_paper.add(mark_two_list.get(i));
+				}
+				for(int i = 0; i<3; i++) {
+					final_paper.add(mark_five_list.get(i));
+				}
+			}
+			else if(qsn_patern.getFull_marks()==70) {
+				for(int i = 0; i<10; i++) {
+					final_paper.add(mark_two_list.get(i));
+				}
+				for(int i = 0; i<5; i++) {
+					final_paper.add(mark_four_list.get(i));
+				}
+				for(int i = 0; i<6; i++) {
+					final_paper.add(mark_five_list.get(i));
+				}
+			}
+			else if(qsn_patern.getFull_marks()==100) {
+				for(int i = 0; i<10; i++) {
+					final_paper.add(mark_one_list.get(i)); //10
+				}
+				for(int i = 0; i<10; i++) {
+					final_paper.add(mark_two_list.get(i)); //20
+				}
+				
+				for(int i = 0; i<10; i++) {
+					final_paper.add(mark_three_list.get(i)); //30
+				}
+				
+				for(int i = 0; i<10; i++) {
+					final_paper.add(mark_five_list.get(i)); //50
+				}
 			}
 			
-			for(int i = 0; i<10; i++) {
-				final_paper.add(mark_five_list.get(i)); //50
+			//adding data in the qsn_paper_db table
+			String topic = "";
+			for(String str: qsn_patern.getTopic()) {
+				topic += str+", ";
 			}
+			
+			topic = topic.substring(0, topic.length()-2);
+			
+			GeneratedPaper generatedPaper = new GeneratedPaper();
+			generatedPaper.setEmail(qsn_patern.getEmail());
+			generatedPaper.setMarks(qsn_patern.getFull_marks());
+			generatedPaper.setSubject(qsn_patern.getSubject());
+			generatedPaper.setTitle(qsn_patern.getTitle());
+			generatedPaper.setTopic(topic);
+			generatedPaper.setQuestions(final_paper);
+			
+			generatedPaperRepository.save(generatedPaper);
+			
+			
+			return final_paper;
+		}else {
+			throw new UsernameAlreadyExistException(qsn_patern.getTitle(), "Title");
 		}
 		
-		//adding data in the qsn_paper_db table
-		String topic = "";
-		for(String str: qsn_patern.getTopic()) {
-			topic += str+", ";
-		}
 		
-		topic = topic.substring(0, topic.length()-2);
-		
-		GeneratedPaper generatedPaper = new GeneratedPaper();
-		generatedPaper.setEmail(qsn_patern.getEmail());
-		generatedPaper.setMarks(qsn_patern.getFull_marks());
-		generatedPaper.setSubject(qsn_patern.getSubject());
-		generatedPaper.setTopic(topic);
-		
-		generatedPaperRepository.save(generatedPaper);
-		
-		
-		return final_paper;
 	}
 
 	@Override
@@ -375,5 +393,27 @@ public class UserServiceImpl implements UserService{
 		
 		return finaList;
 	}
+
+	@Override
+	public List<QuestionDto> getGeneratedPapers(GeneratedPaperRequest paper) {
+		List<GeneratedPaper> ext_paper = generatedPaperRepository.findQuestions(paper.getEmail(), paper.getTitle());
+//		List<GeneratedPaper> ext_paper = generatedPaperRepository.findByTitle(paper.getTitle());
+		List<Question> extQuestions = ext_paper.get(0).getQuestions();
+		List<QuestionDto> final_paper = new ArrayList<>();
+		
+		for(Question q: extQuestions) {
+			QuestionDto new_qsn = new QuestionDto();
+			new_qsn.setId(q.getId());
+			new_qsn.setQuestion(q.getQuestion());
+			new_qsn.setMarks(q.getMarks());
+			new_qsn.setFull_marks(ext_paper.get(0).getMarks());
+			
+			final_paper.add(new_qsn);
+		}
+		
+		return final_paper;
+	}
+
+	
 
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.ExamSubmitRequestDto;
 import com.example.demo.dto.GenerateRequestDto;
+import com.example.demo.dto.GeneratedPaperRequest;
 import com.example.demo.dto.InputQuestionDto;
 import com.example.demo.dto.LoginDto;
 import com.example.demo.dto.QuestionResponse;
@@ -73,5 +74,10 @@ public class UserController {
 	@GetMapping("qms/contributed/{email}")
 	public ResponseEntity<?> getContributedQuestion(@PathVariable String email){
 		return new ResponseEntity<>(userService.getContributedQuestions(email), HttpStatus.OK);
+	}
+	
+	@PostMapping("qms/get/papers")
+	public ResponseEntity<?> getGeneratedPapers(@RequestBody GeneratedPaperRequest paper){
+		return new ResponseEntity<>(userService.getGeneratedPapers(paper), HttpStatus.OK);
 	}
 }

@@ -1,9 +1,12 @@
 package com.example.demo.model;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -13,22 +16,28 @@ public class GeneratedPaper {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	private String title;
 	private String email;
 	private String subject;
 	private String topic;
 	private int marks;
 	
+	@ManyToMany
+	private List<Question> questions;
+	
 	public GeneratedPaper() {
 		
 	}
 	
-	public GeneratedPaper(Long id, String email, String subject, String topic, int marks) {
+	public GeneratedPaper(Long id, String title, String email, String subject, String topic, int marks, List<Question>questions ) {
 		super();
 		this.id = id;
+		this.title = title;
 		this.email = email;
 		this.subject = subject;
 		this.topic = topic;
 		this.marks = marks;
+		this.questions = questions;
 	}
 
 	public Long getId() {
@@ -37,6 +46,14 @@ public class GeneratedPaper {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getEmail() {
@@ -69,6 +86,14 @@ public class GeneratedPaper {
 
 	public void setMarks(int marks) {
 		this.marks = marks;
+	}
+
+	public List<Question> getQuestions() {
+		return questions;
+	}
+
+	public void setQuestions(List<Question> questions) {
+		this.questions = questions;
 	}
 	
 }

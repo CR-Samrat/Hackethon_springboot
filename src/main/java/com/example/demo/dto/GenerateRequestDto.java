@@ -4,6 +4,7 @@ import java.util.List;
 
 public class GenerateRequestDto {
 	private String email;
+	private String title;
 	private String subject;
 	private List<String> topic;
 	private int full_marks;
@@ -12,9 +13,10 @@ public class GenerateRequestDto {
 		
 	}
 
-	public GenerateRequestDto(String email, String subject, List<String> topic, int full_marks) {
+	public GenerateRequestDto(String email, String title ,String subject, List<String> topic, int full_marks) {
 		super();
 		
+		this.title = title;
 		this.email = email;
 		this.subject = subject;
 		this.topic = topic;
@@ -51,6 +53,14 @@ public class GenerateRequestDto {
 
 	public void setFull_marks(int full_marks) {
 		this.full_marks = full_marks;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 	
 	
